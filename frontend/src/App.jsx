@@ -28,8 +28,34 @@ function App() {
     setUser(null);
     localStorage.removeItem('user_lanuza');
     localStorage.removeItem('token_lanuza');
-
   };
+
+  // --- ESCUDO DE INACTIVIDAD (10 MINUTOS) ---
+  useEffect(() => {
+    if (!user) return;
+
+    let timer;
+
+    const resetTimer = () => {
+      if (timer) clearTimeout(timer);
+      
+      timer = setTimeout(() => {
+        handleLogout();
+        alert("Sesión cerrada por seguridad tras 10 minutos de inactividad.");
+      }, 10 * 60 * 1000);
+    };
+
+    const eventos = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'];
+
+    eventos.forEach(e => window.addEventListener(e, resetTimer));
+
+    resetTimer();
+
+    return () => {
+      if (timer) clearTimeout(timer);
+      eventos.forEach(e => window.removeEventListener(e, resetTimer));
+    };
+  }, [user]);
 
   return (
     <Router>
@@ -46,7 +72,7 @@ function App() {
           element={user ? <Dashboard user={user} onLogout={handleLogout} /> : <Navigate to="/login" />} 
         />
 
-        {/* REDIRECCIÓN POR DEFECTO: Si pones cualquier otra cosa, te manda al login o dashboard según si estás logueado */}
+        {/* REDIRECCIÓN POR DEFECTO */}
         <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
       </Routes>
     </Router>

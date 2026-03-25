@@ -1,11 +1,11 @@
-const express = require('express');
 const cors = require('cors');
 const db = require('./db');
 const jwt = require('jsonwebtoken');
-const SECRET_KEY = process.env.JWT_SECRET;
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 require('dotenv').config();
+const express = require('express');
+const SECRET_KEY = process.env.JWT_SECRET;
 
 if (!SECRET_KEY) {
   console.error("❌ ERROR: No se ha encontrado la JWT_SECRET en el archivo .env");
