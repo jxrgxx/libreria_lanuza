@@ -28,7 +28,7 @@ function Login({ onLoginSuccess }) {
 
       if (res.data.success) {
         onLoginSuccess(res.data);
-        navigate('/dashboard');
+        navigate('/');
       }
     } catch (err) {
       const mensajeError = err.response?.data?.message || 'Credenciales incorrectas';

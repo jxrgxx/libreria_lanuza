@@ -39,7 +39,7 @@ function verificarToken(req, res, next) {
   });
 }
 
-app.get('/libros', verificarToken,(req, res) => {
+app.get('/libros', (req, res) => {
   db.query('SELECT * FROM Libro', (err, results) => {
     if (err) {
       res.status(500).send('Error en la base de datos');
@@ -48,6 +48,9 @@ app.get('/libros', verificarToken,(req, res) => {
     }
   });
 });
+
+app.post('/libros', verificarToken, (req, res) => { });
+app.post('/prestamos', verificarToken, (req, res) => { });
 
 const PORT = 3001;
 app.listen(PORT, () => {

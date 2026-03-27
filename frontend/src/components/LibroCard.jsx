@@ -1,4 +1,4 @@
-function LibroCard({ libro }) {
+function LibroCard({ libro, user }) {
   const statusStyles = {
     Disponible: "bg-green-100 text-green-700 border-green-200",
     Prestado: "bg-orange-100 text-orange-700 border-orange-200",
@@ -14,16 +14,16 @@ function LibroCard({ libro }) {
           {libro.estado_libro.toUpperCase()}
         </span>
       </div>
-
       <div className="text-sm text-gray-600 space-y-1">
         <p><span className="font-medium text-gray-400">Autor:</span> {libro.autor_libro}</p>
         <p><span className="font-medium text-gray-400">Género:</span> {libro.genero_libro}</p>
       </div>
-
       <div className="mt-5 flex gap-2">
-        <button className="flex-1 text-sm font-semibold py-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition">
+        {user && (
+          <button className="flex-1 text-sm font-semibold py-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition">
           Prestar
         </button>
+        )}
         <button className="flex-1 text-sm font-semibold py-2 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-200 transition">
           Detalles
         </button>

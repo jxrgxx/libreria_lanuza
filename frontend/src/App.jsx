@@ -60,20 +60,20 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* RUTA DE LOGIN */}
+        {/* LA RAÍZ AHORA ES EL DASHBOARD */}
+        <Route 
+          path="/" 
+          element={<Dashboard user={user} onLogout={handleLogout} />} 
+        />
+
+        {/* EL LOGIN ES UNA RUTA APARTE */}
         <Route 
           path="/login" 
-          element={!user ? <Login onLoginSuccess={handleLogin} /> : <Navigate to="/dashboard" />} 
+          element={!user ? <Login onLoginSuccess={handleLogin} /> : <Navigate to="/" />} 
         />
 
-        {/* RUTA DE DASHBOARD (Protegida) */}
-        <Route 
-          path="/dashboard" 
-          element={user ? <Dashboard user={user} onLogout={handleLogout} /> : <Navigate to="/login" />} 
-        />
-
-        {/* REDIRECCIÓN POR DEFECTO */}
-        <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
+        {/* REDIRECCIÓN: Cualquier cosa rara manda a la raíz */}
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
   );
