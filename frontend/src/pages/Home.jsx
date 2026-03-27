@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import LibroCard from '../components/LibroCard';
 
-function Dashboard({ user, onLogout }) {
+function Home({ user, onLogout }) {
   const [libros, setLibros] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -39,17 +39,16 @@ function Dashboard({ user, onLogout }) {
           <div className="flex items-center gap-3">
             <span className="text-3xl">📚</span>
             <div>
-              <h1 className="text-xl font-black text-[#7F252E] uppercase tracking-tighter font-lanuza leading-none">
+              <h1 className="text-xl font-medium text-[#7F252E] uppercase tracking-tighter font-lanuza leading-none">
                 Lanuza Libros
               </h1>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Biblioteca Escolar</p>
+              <p className="text-[10px] text-slate-400 font-lanuza uppercase tracking-widest">Biblioteca Escolar</p>
             </div>
           </div>
           
           {/* Sección de Usuario / Acceso */}
           <div className="flex items-center gap-6">
             {user ? (
-              // VISTA CUANDO HAY LOGUEO (Bibliotecario/Admin)
               <div className="flex items-center gap-5">
                 <div className="text-right hidden sm:block border-r pr-5 border-slate-200">
                   <p className="text-sm font-bold text-slate-900">{user.correo}</p>
@@ -63,7 +62,6 @@ function Dashboard({ user, onLogout }) {
                 </button>
               </div>
             ) : (
-              // VISTA CUANDO ES INVITADO (Alumno/Docente)
               <button 
                 onClick={() => navigate('/login')}
                 className="bg-[#7F252E] text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-[#631d24] transition-all shadow-lg shadow-red-900/10 active:scale-95"
@@ -81,7 +79,7 @@ function Dashboard({ user, onLogout }) {
         {/* Encabezado dinámico */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-4">
           <div>
-            <h2 className="text-4xl font-black text-slate-800 tracking-tight">
+            <h2 className="text-4xl font-medium font-lanuza text-[#7F252E] tracking-tight ">
               {user ? "Panel de Gestión" : "Catálogo de Libros"}
             </h2>
             <p className="text-slate-500 text-lg">
@@ -127,4 +125,4 @@ function LoaderComponent() {
   );
 }
 
-export default Dashboard;
+export default Home;

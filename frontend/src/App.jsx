@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
+import Home from './pages/Home';
 
 function App() {
   const [user, setUser] = useState(() => {
@@ -63,7 +63,7 @@ function App() {
         {/* LA RAÍZ AHORA ES EL DASHBOARD */}
         <Route 
           path="/" 
-          element={<Dashboard user={user} onLogout={handleLogout} />} 
+          element={<Home user={user} onLogout={handleLogout} />} 
         />
 
         {/* EL LOGIN ES UNA RUTA APARTE */}

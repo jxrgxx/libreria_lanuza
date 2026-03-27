@@ -7,28 +7,61 @@ function LibroCard({ libro, user }) {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
-      <div className="flex justify-between items-start mb-3">
-        <h3 className="font-bold text-lg text-gray-800 leading-tight">{libro.titulo}</h3>
-        <span className={`text-[10px] font-bold px-2 py-1 rounded-full border ${statusStyles[libro.estado] || statusStyles["No Disponible"]}`}>
-          {libro.estado.toUpperCase()}
-        </span>
+    <div className="group bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col h-full">
+      {/* 1. ÁREA DE IMAGEN (PORTADA) */}
+      <div className="relative h-64 bg-slate-100 overflow-hidden">
+        <img 
+          src={libro.portada ? `/portadas/${libro.portada}` : '/portadas/default.png'} 
+          alt={libro.titulo} 
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+        />
+        {/* Badge de estado sobre la imagen */}
+        <div className="absolute top-3 right-3">
+          <span className={`text-[10px] font-lanuza font-bold px-3 py-1 rounded-full border shadow-sm backdrop-blur-sm ${statusStyles[libro.estado] || statusStyles["No Disponible"]}`}>
+            {libro.estado?.toUpperCase()}
+          </span>
+        </div>
       </div>
 
-      <div className="text-sm text-gray-600 space-y-1">
-        <p><span className="font-medium text-gray-400">Autor:</span> {libro.autor}</p>
-        <p><span className="font-medium text-gray-400">Género:</span> {libro.genero}</p>
-      </div>
+      {/* 2. CUERPO DE LA TARJETA */}
+      <div className="p-5 flex flex-col flex-1">
+        
+        {/* Título del libro */}
+        <h3 className="font-lanuza font-bold text-lg text-slate-800 leading-tight mb-4 min-h-[3rem] line-clamp-2">
+          {libro.titulo}
+        </h3>
 
-      <div className="mt-5 flex gap-2">
-        {user && (
-          <button className="flex-1 text-sm font-semibold py-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition">
-          Prestar
-        </button>
-        )}
-        <button className="flex-1 text-sm font-semibold py-2 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-200 transition">
-          Detalles
-        </button>
+        {/* METADATOS (Autor, Género, Páginas) */}
+        <div className="text-sm space-y-2 font-lanuza flex-1">
+          <p className="text-slate-500">
+            <span className="font-bold text-black mr-1">Autor:</span> 
+            {libro.autor}
+          </p>
+          <p className="text-slate-500">
+            <span className="font-bold text-black mr-1">Género:</span> 
+            {libro.genero}
+          </p>
+          <p className="text-slate-500">
+            <span className="font-bold text-black mr-1">Páginas:</span> 
+            {libro.paginas}
+          </p>
+        </div>
+
+        {/* 3. BOTONES DE ACCIÓN */}
+        <div className="mt-6 flex gap-2">
+          {/* Botón Prestar: Solo visible para bibliotecarios */}
+          {user && (
+            <button className="flex-1 text-xs font-bold py-3 bg-[#7F252E] text-white rounded-xl hover:bg-[#631d24] transition-all transform active:scale-95 shadow-md shadow-red-900/10 uppercase tracking-wider">
+              Prestar
+            </button>
+          )}
+          
+          {/* Botón Detalles: Visible para todos */}
+          <button className="flex-1 text-xs font-bold py-3 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition-all transform active:scale-95 uppercase tracking-wider">
+            Detalles
+          </button>
+        </div>
+
       </div>
     </div>
   );
