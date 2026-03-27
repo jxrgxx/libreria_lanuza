@@ -18,7 +18,6 @@ function Login({ onLoginSuccess }) {
     setError('');
 
     try {
-      // Cifrado de contraseña
       const passwordHashed = CryptoJS.SHA256(password.trim()).toString(CryptoJS.enc.Hex);
 
       const res = await axios.post('http://localhost:3001/login', {

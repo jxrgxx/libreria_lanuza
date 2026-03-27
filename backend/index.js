@@ -1,9 +1,10 @@
+require('dotenv').config({ quiet: true });
+
 const cors = require('cors');
 const db = require('./db');
 const jwt = require('jsonwebtoken');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
-require('dotenv').config();
 const express = require('express');
 const SECRET_KEY = process.env.JWT_SECRET;
 
@@ -59,7 +60,7 @@ app.listen(PORT, () => {
 
 app.post('/login', loginLimiter,(req, res) => {
   const { correo, contrasenya } = req.body;
-  const sql = 'SELECT * FROM Usuario WHERE correo_usuario = ? AND contrasenya_usuario = ?';
+  const sql = 'SELECT * FROM Usuario WHERE correo = ? AND contrasenya = ?';
   
   db.query(sql, [correo, contrasenya], (err, results) => {
     if (err) {
@@ -73,7 +74,7 @@ app.post('/login', loginLimiter,(req, res) => {
         { expiresIn: '8h' }
       );
 
-      delete user.contrasenya_usuario;
+      delete user.contrasenya;
       res.json({ success: true, token,user });
     } else {
       res.status(401).json({ success: false, message: 'Credenciales incorrectas' });

@@ -52,8 +52,8 @@ function Dashboard({ user, onLogout }) {
               // VISTA CUANDO HAY LOGUEO (Bibliotecario/Admin)
               <div className="flex items-center gap-5">
                 <div className="text-right hidden sm:block border-r pr-5 border-slate-200">
-                  <p className="text-sm font-bold text-slate-900">{user.correo_usuario}</p>
-                  <p className="text-xs font-bold text-[#7F252E] uppercase">{user.rol_usuario}</p>
+                  <p className="text-sm font-bold text-slate-900">{user.correo}</p>
+                  <p className="text-xs font-bold text-[#7F252E] uppercase">{user.rol}</p>
                 </div>
                 <button 
                   onClick={onLogout}
