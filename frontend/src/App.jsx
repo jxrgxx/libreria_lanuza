@@ -30,7 +30,6 @@ function App() {
     localStorage.removeItem('token_lanuza');
   };
 
-  // --- ESCUDO DE INACTIVIDAD (10 MINUTOS) ---
   useEffect(() => {
     if (!user) return;
 
