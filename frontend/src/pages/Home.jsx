@@ -333,7 +333,7 @@ function Home({ user, onLogout }) {
                     <button
                       onClick={handleCargarMas}
                       disabled={loading}
-                      className={`bg-white text-[#7F252E] border-2 border-[#7F252E] px-10 py-3 rounded-2xl font-bold transition-all transform active:scale-95 shadow-md font-lanuza flex items-center gap-3
+                      className={`bg-white text-[#7F252E] border-2 border-[#7F252E] px-10 py-3 rounded-2xl font-medium transition-all transform active:scale-95 shadow-md font-lanuza flex items-center gap-3
                       ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#7F252E] hover:text-white'}`}
                     >
                       {loading ? (

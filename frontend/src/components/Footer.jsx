@@ -24,6 +24,7 @@ function Footer() {
             <h4 className="text-xs font-black text-black uppercase tracking-[0.2em]">
               La Biblioteca
             </h4>
+
             <ul className="space-y-3 text-sm text-slate-600">
               <li className="flex items-center gap-3">
                 <Clock size={18} className="text-[#7F252E]" />
@@ -33,11 +34,14 @@ function Footer() {
                 <MapPin size={18} className="text-[#7F252E]" />
                 <span>Planta 1 — Edificio A</span>
               </li>
-              <li className="flex items-center gap-3">
-                <ShieldCheck size={18} className="text-[#7F252E]" />
-                <span>Máximo 3 libros por alumno</span>
-              </li>
             </ul>
+
+            {/* VERSIÓN DEL SISTEMA: Centrada en su columna con margen superior */}
+            <div className="mt-auto pt-10">
+              <p className="text-[10px] text-slate-400 font-medium text-center uppercase tracking-wider">
+                Versión del sistema: 1.0.0
+              </p>
+            </div>
           </div>
 
           {/* COLUMNA 3: SOPORTE TÉCNICO */}
@@ -50,16 +54,11 @@ function Footer() {
             </p>
             <a
               href="mailto:informatica@juandelanuza.org"
-              className="inline-flex items-center gap-3 text-sm font-bold text-[#7F252E] hover:underline"
+              className="inline-flex items-center gap-3 text-sm font-medium text-[#7F252E] hover:underline"
             >
               <Mail size={18} />
               informatica@juandelanuza.org
             </a>
-            <div className="pt-2">
-              <p className="text-[10px] text-slate-400 font-medium">
-                VERSIÓN DEL SISTEMA: 1.0.0
-              </p>
-            </div>
           </div>
         </div>
 
