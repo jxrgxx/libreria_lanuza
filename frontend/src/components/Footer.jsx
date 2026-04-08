@@ -32,7 +32,7 @@ function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <MapPin size={18} className="text-[#7F252E]" />
-                <span>Planta 1 — Edificio A</span>
+                <span>2º Planta</span>
               </li>
             </ul>
 

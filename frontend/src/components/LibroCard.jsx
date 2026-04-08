@@ -72,13 +72,6 @@ function LibroCard({ libro, user }) {
 
         {/* 3. BOTONES DE ACCIÓN */}
         <div className="mt-6 flex gap-2">
-          {/* Botón Prestar: Solo visible para bibliotecarios */}
-          {user && (
-            <button className="flex-1 text-xs font-bold py-3 bg-[#7F252E] text-white rounded-xl hover:bg-[#631d24] transition-all transform active:scale-95 shadow-md shadow-red-900/10 uppercase tracking-wider">
-              Prestar
-            </button>
-          )}
-
           {/* Botón Detalles: Visible para todos */}
           <button className="flex-1 text-xs font-bold py-3 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition-all transform active:scale-95 uppercase tracking-wider">
             Detalles
