@@ -270,7 +270,7 @@ function Home({ user, onLogout }) {
                 Orden:
               </span>
               <select
-                className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-1 focus:ring-[#7F252E] text-xs text-black font-lanuza cursor-pointer font-medium"
+                className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-1 focus:ring-[#7F252E] text-xs text-slate-600 font-lanuza cursor-pointer"
                 value={sortField}
                 onChange={(e) => setSortField(e.target.value)}
               >
