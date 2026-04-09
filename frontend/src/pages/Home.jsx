@@ -169,11 +169,6 @@ function Home({ user, onLogout }) {
                 : 'Explora nuestra colección y selecciona tu próxima lectura.'}
             </p>
           </div>
-          {user && (
-            <button className="bg-[#7F252E] text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-red-900/10 hover:bg-[#631d24] transition transform hover:-translate-y-1 active:scale-95 font-lanuza">
-              + Nuevo Libro
-            </button>
-          )}
         </div>
 
         {/* 2. BARRA DE HERRAMIENTAS (Buscador, Filtros y Ordenación) */}

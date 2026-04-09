@@ -1,10 +1,4 @@
 const mysql = require('mysql2');
-const path = require('path');
-const dotenv = require('dotenv');
-
-dotenv.config();
-
-dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
@@ -21,7 +15,9 @@ pool.getConnection((err, connection) => {
     console.error('❌ Error al conectar al Pool de MariaDB:', err.message);
     return;
   }
-  console.log('✅ Pool de MariaDB conectado como: ' + process.env.DB_USER);
+  console.log(
+    '✅ Pool de MariaDB conectado como: ' + (process.env.DB_USER || 'root')
+  );
   connection.release();
 });
 
