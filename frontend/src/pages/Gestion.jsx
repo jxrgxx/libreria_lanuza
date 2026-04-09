@@ -33,7 +33,7 @@ function Gestion({ user }) {
     const token = localStorage.getItem('token_lanuza');
     try {
       const res = await axios.post(
-        'http://localhost:3001/prestamos',
+        '/api/prestamos',
         { id_libro: idLibro, correo_alumno: correo },
         { headers: { Authorization: `Bearer ${token}` } }
       );

@@ -22,7 +22,7 @@ function Login({ onLoginSuccess }) {
         CryptoJS.enc.Hex
       );
 
-      const res = await axios.post('http://localhost:3001/login', {
+      const res = await axios.post('/api/login', {
         correo: correo.trim(),
         contrasenya: passwordHashed,
       });

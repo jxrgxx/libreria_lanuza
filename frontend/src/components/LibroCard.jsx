@@ -53,10 +53,6 @@ function LibroCard({ libro, user }) {
             {libro.genero}
           </p>
           <p className="text-slate-500">
-            <span className="font-medium text-black mr-1">Páginas:</span>
-            {libro.paginas}
-          </p>
-          <p className="text-slate-500">
             <span className="font-medium text-black mr-1">Editorial:</span>
             {libro.editorial}
           </p>

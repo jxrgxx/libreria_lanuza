@@ -28,7 +28,7 @@ function Home({ user, onLogout }) {
 
     const token = localStorage.getItem('token_lanuza');
     try {
-      const res = await axios.get(`http://localhost:3001/libros`, {
+      const res = await axios.get(`/api/libros`, {
         params: {
           q: busqueda,
           genero: genero,
@@ -76,8 +76,8 @@ function Home({ user, onLogout }) {
   useEffect(() => {
     const cargarFiltros = async () => {
       try {
-        const resG = await axios.get('http://localhost:3001/generos');
-        const resE = await axios.get('http://localhost:3001/editoriales');
+        const resG = await axios.get('/api/generos');
+        const resE = await axios.get('/api/editoriales');
         setGeneros(resG.data);
         setEditoriales(resE.data);
       } catch (error) {

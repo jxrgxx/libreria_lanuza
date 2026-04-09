@@ -54,48 +54,48 @@ app.get('/libros', (req, res) => {
   const paginaActual = parseInt(page) || 1;
   const saltar = (paginaActual - 1) * limite; //Offest
 
-  let sql = 'SELECT * FROM Libro WHERE 1=1';
+  let sql = 'select * from libro where 1=1';
   let params = [];
 
   if (q && q.trim() !== '') {
-    sql += ' AND (titulo LIKE ? OR autor LIKE ?)';
+    sql += ' and (titulo like ? or autor like ?)';
     params.push(`%${q}%`, `%${q}%`);
   }
 
   if (editorial && editorial !== '') {
-    sql += ' AND editorial = ?';
+    sql += ' and editorial = ?';
     params.push(editorial);
   }
 
   if (anyo && anyo !== '') {
     if (anyo === '2020') {
-      sql += ' AND anyo_publicacion >= 2020';
+      sql += ' and anyo_publicacion >= 2020';
     } else if (anyo === '2010') {
-      sql += ' AND anyo_publicacion BETWEEN 2010 AND 2019';
+      sql += ' and anyo_publicacion between 2010 and 2019';
     } else if (anyo === 'antiguo') {
-      sql += ' AND anyo_publicacion < 1990';
+      sql += ' and anyo_publicacion < 1990';
     } else {
-      sql += ' AND anyo_publicacion BETWEEN ? AND ?';
+      sql += ' and anyo_publicacion between ? and ?';
       params.push(parseInt(anyo), parseInt(anyo) + 9);
     }
   }
 
   if (genero && genero !== '') {
-    sql += ' AND genero = ?';
+    sql += ' and genero = ?';
     params.push(genero);
   }
 
   if (paginas && paginas !== '') {
     if (paginas === 'muy-corto') {
-      sql += ' AND paginas < 50';
+      sql += ' and paginas < 50';
     } else if (paginas === 'corto') {
-      sql += ' AND paginas BETWEEN 50 AND 100';
+      sql += ' and paginas between 50 and 100';
     } else if (paginas === 'estandar') {
-      sql += ' AND paginas BETWEEN 101 AND 300';
+      sql += ' and paginas between 101 and 300';
     } else if (paginas === 'largo') {
-      sql += ' AND paginas BETWEEN 301 AND 600';
+      sql += ' and paginas between 301 and 600';
     } else if (paginas === 'muy-largo') {
-      sql += ' AND paginas > 600';
+      sql += ' and paginas > 600';
     }
   }
 
@@ -112,9 +112,9 @@ app.get('/libros', (req, res) => {
   const campoOrden = columnasPermitidas.includes(sort) ? sort : 'titulo';
   const direccionOrden = direccionesPermitidas.includes(order) ? order : 'ASC';
 
-  sql += ` ORDER BY ${campoOrden} ${direccionOrden}`;
+  sql += ` order by ${campoOrden} ${direccionOrden}`;
 
-  sql += ` LIMIT ? OFFSET ?`;
+  sql += ` limit ? offset ?`;
   params.push(limite, saltar);
 
   db.query(sql, params, (err, results) => {
@@ -125,7 +125,7 @@ app.get('/libros', (req, res) => {
 
 app.get('/generos', (req, res) => {
   const sql =
-    'SELECT DISTINCT genero FROM Libro WHERE genero IS NOT NULL AND genero != "" ORDER BY genero ASC';
+    'select distinct genero from libro where genero is not null and genero != "" order by genero asc';
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json(err);
     const lista = results.map((row) => row.genero);
@@ -135,7 +135,7 @@ app.get('/generos', (req, res) => {
 
 app.get('/editoriales', (req, res) => {
   const sql =
-    'SELECT DISTINCT editorial FROM Libro WHERE editorial IS NOT NULL AND editorial != "" ORDER BY editorial ASC';
+    'select distinct editorial from libro where editorial is not null and editorial != "" order by editorial asc';
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json(err);
     const lista = results.map((row) => row.editorial);
@@ -147,7 +147,7 @@ app.get('/usuarios/buscar', verificarToken, (req, res) => {
   const correo = req.query.email;
 
   const sql =
-    'SELECT id_usuario, nombre, correo FROM Usuario WHERE correo = ? AND rol = "Alumno"';
+    'select id_usuario, nombre, correo from usuario where correo = ? and rol = "alumno"';
 
   db.query(sql, [correo], (err, results) => {
     if (err) return res.status(500).json(err);
@@ -167,7 +167,7 @@ app.listen(PORT, () => {
 app.post('/login', loginLimiter, (req, res) => {
   const { correo, contrasenya } = req.body;
 
-  const sql = 'SELECT * FROM Usuario WHERE correo = ? AND contrasenya = ?';
+  const sql = 'select * from usuario where correo = ? and contrasenya = ?';
 
   db.query(sql, [correo, contrasenya], (err, results) => {
     if (err) {
@@ -193,7 +193,7 @@ app.post('/prestamos', verificarToken, (req, res) => {
   const { id_libro, correo_alumno } = req.body;
 
   db.query(
-    'SELECT id_usuario, correo FROM Usuario WHERE correo = ?',
+    'select id_usuario, correo from usuario where correo = ?',
     [correo_alumno],
     (err, users) => {
       if (err)
@@ -208,7 +208,7 @@ app.post('/prestamos', verificarToken, (req, res) => {
       const id_usuario = users[0].id_usuario;
 
       db.query(
-        'SELECT titulo, estado FROM Libro WHERE id_libro = ?',
+        'select titulo, estado from libro where id_libro = ?',
         [id_libro],
         (err, libros) => {
           if (err)
@@ -228,7 +228,7 @@ app.post('/prestamos', verificarToken, (req, res) => {
           }
 
           db.query(
-            'SELECT * FROM prestamo WHERE id_libro = ? AND devuelto = 0',
+            'select * from prestamo where id_libro = ? and devuelto = 0',
             [id_libro],
             (err, prestamosActivos) => {
               if (prestamosActivos.length > 0) {
@@ -243,10 +243,7 @@ app.post('/prestamos', verificarToken, (req, res) => {
               const limite = new Date();
               limite.setDate(ahora.getDate() + 15);
 
-              const sqlInsert = `
-          INSERT INTO prestamo (id_libro, id_usuario, fecha_inicio, fecha_limite, devuelto) 
-          VALUES (?, ?, ?, ?, 0)
-        `;
+              const sqlInsert = `insert into prestamo (id_libro, id_usuario, fecha_inicio, fecha_limite, devuelto) values (?, ?, ?, ?, 0)`;
 
               db.query(
                 sqlInsert,
@@ -259,7 +256,7 @@ app.post('/prestamos', verificarToken, (req, res) => {
                     });
 
                   db.query(
-                    'UPDATE Libro SET estado = "Prestado" WHERE id_libro = ?',
+                    'update libro set estado = "prestado" where id_libro = ?',
                     [id_libro],
                     (err) => {
                       if (err)
