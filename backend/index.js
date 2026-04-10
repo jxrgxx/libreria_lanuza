@@ -372,7 +372,7 @@ app.post('/prestamos', verificarToken, (req, res) => {
 });
 
 app.get('/prestamos-detallados', verificarToken, (req, res) => {
-  const { sort, order } = req.query;
+  const { sort, order, serachField, searchValue } = req.query;
 
   const mapColumnas = {
     id: 'p.id_prestamo',
@@ -384,7 +384,19 @@ app.get('/prestamos-detallados', verificarToken, (req, res) => {
     estado: 'p.devuelto',
   };
 
-  const sqlBase = `
+  const mapFiltros = {
+    id_prestamo: 'p.id_prestamo',
+    id_libro: 'p.id_libro',
+    id_usuario: 'p.id_usuario',
+    libro: 'l.titulo',
+    alumno: 'u.correo',
+    fecha_inicio: 'p.fecha_inicio',
+    fecha_limite: 'p.fecha_limite',
+    fecha_devolucion: 'p.fecha_devolucion',
+    devuelto: 'p.devuelto',
+  };
+
+  let sql = `
     SELECT p.*, l.titulo as titulo_libro, u.correo as correo_usuario 
     FROM prestamo p
     JOIN libro l ON p.id_libro = l.id_libro
@@ -392,13 +404,23 @@ app.get('/prestamos-detallados', verificarToken, (req, res) => {
     WHERE 1=1
   `;
 
+  let params = [];
+
+  if (serachField && searchValue) {
+    sql += ` AND ${mapFiltros[serachField]} LIKE ?`;
+    params.push(`%${searchValue}%`);
+  }
+
   const campoOrden = mapColumnas[sort] || 'p.fecha_inicio';
   const direccionOrden = order === 'ASC' || order === 'DESC' ? order : 'DESC';
 
-  const sqlFinal = `${sqlBase} ORDER BY ${campoOrden} ${direccionOrden}`;
+  sql += ` ORDER BY ${campoOrden} ${direccionOrden}`;
 
-  db.query(sqlFinal, (err, results) => {
-    if (err) return res.status(500).json(err);
+  db.query(sql, params, (err, results) => {
+    if (err) {
+      console.error('Error SQL:', err);
+      return res.status(500).json(err);
+    }
     res.json(results);
   });
 });

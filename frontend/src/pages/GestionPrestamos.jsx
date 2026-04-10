@@ -9,6 +9,7 @@ import {
   ArrowUp,
   ArrowDown,
   ArrowUpDown,
+  Search,
 } from 'lucide-react';
 
 function GestionPrestamos({ user }) {
@@ -17,6 +18,8 @@ function GestionPrestamos({ user }) {
     direction: 'DESC',
   });
 
+  const [searchField, setSearchField] = useState('libro');
+  const [searchValue, setSearchValue] = useState('');
   const [idLibro, setIdLibro] = useState('');
   const [correo, setCorreo] = useState('');
   const [mensaje, setMensaje] = useState({ tipo: '', texto: '' });
@@ -36,6 +39,8 @@ function GestionPrestamos({ user }) {
         params: {
           sort: sortConfig.key,
           order: sortConfig.direction,
+          searchField: searchField,
+          searchValue: searchValue,
         },
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token_lanuza')}`,
@@ -48,9 +53,11 @@ function GestionPrestamos({ user }) {
   };
 
   useEffect(() => {
-    inputRef.current?.focus();
-    cargarPrestamos();
-  }, [sortConfig]);
+    const timeoutId = setTimeout(() => {
+      cargarPrestamos();
+    }, 300);
+    return () => clearTimeout(timeoutId);
+  }, [sortConfig, searchField, searchValue]);
 
   const handlePrestamo = async (e) => {
     e.preventDefault();
@@ -163,8 +170,56 @@ function GestionPrestamos({ user }) {
             </div>
           )}
         </div>
-        <div className="lg:col-span-2 hidden lg:flex items-center justify-center opacity-20 italic text-slate-400">
-          Panel de operaciones en tiempo real - Biblioteca Juan de Lanuza
+
+        <div className="lg:col-span-2 bg-white p-8 rounded-3xl shadow-xl border border-slate-100 flex flex-col justify-center">
+          <div className="flex items-center gap-2 mb-4">
+            <Search size={18} className="text-[#7F252E]" />
+            <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest">
+              Buscador de Historial
+            </h2>
+          </div>
+
+          <div className="flex flex-col md:flex-row gap-3">
+            {/* SELECTOR DE CAMPO */}
+            <select
+              className="bg-slate-50 border border-slate-200 p-4 rounded-2xl outline-none focus:border-[#7F252E] font-bold text-xs text-slate-600 cursor-pointer"
+              value={searchField}
+              onChange={(e) => setSearchField(e.target.value)}
+            >
+              <option value="libro">Título del Libro</option>
+              <option value="alumno">Correo del Alumno</option>
+              <option value="id_prestamo">ID Préstamo (#)</option>
+              <option value="id_libro">ID Libro</option>
+              <option value="id_usuario">ID Usuario</option>
+              <option value="fecha_inicio">Fecha Inicio</option>
+              <option value="fecha_limite">Fecha Límite</option>
+              <option value="fecha_devolucion">Fecha Devolución</option>
+              <option value="devuelto">Estado (0/1)</option>
+            </select>
+
+            {/* INPUT DE BÚSQUEDA */}
+            <div className="relative flex-1">
+              <input
+                type="text"
+                placeholder={`Buscar por ${searchField}...`}
+                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-[#7F252E] transition-all font-medium text-slate-700"
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+              />
+              {searchValue && (
+                <button
+                  onClick={() => setSearchValue('')}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-500 transition-colors"
+                >
+                  <X size={18} />
+                </button>
+              )}
+            </div>
+          </div>
+
+          <p className="text-[10px] text-slate-400 mt-4 italic font-lanuza">
+            * Escribe para filtrar el historial en tiempo real.
+          </p>
         </div>
       </div>
 
@@ -276,7 +331,7 @@ function GestionPrestamos({ user }) {
                     <div className="flex justify-left gap-3">
                       <button
                         onClick={() => setEditando(p)}
-                        className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition"
+                        className="text-blue-500 hover:bg-blue-50 rounded-lg transition"
                       >
                         <Edit size={16} />
                       </button>
