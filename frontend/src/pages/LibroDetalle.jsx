@@ -58,7 +58,7 @@ function LibroDetalle() {
     );
 
   return (
-    <div className="min-h-screen bg-slate-50 font-lanuza flex flex-col">
+    <div className="bg-slate-50 font-lanuza flex flex-col">
       {/* --- 1. BARRA SUPERIOR (NAVBAR) --- */}
       <nav className="bg-white border-b border-slate-200 px-8 py-4 sticky top-0 z-50 shadow-sm">
         <div className="w-full px-4 md:px-10 flex justify-between items-center mx-auto">
@@ -85,7 +85,7 @@ function LibroDetalle() {
       </nav>
 
       {/* --- 2. CONTENIDO PRINCIPAL --- */}
-      <main className="flex-grow p-6 md:p-12">
+      <main className="px-6 py-4 md:px-12 md:py-8">
         <div className="max-w-7xl mx-auto">
           <div className="bg-white rounded-[3rem] shadow-2xl shadow-slate-200/60 border border-slate-100 overflow-hidden flex flex-col md:flex-row min-h-[500px]">
             {/* LADO IZQUIERDO: PORTADA */}

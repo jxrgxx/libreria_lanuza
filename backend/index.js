@@ -372,7 +372,7 @@ app.post('/prestamos', verificarToken, (req, res) => {
 });
 
 app.get('/prestamos-detallados', verificarToken, (req, res) => {
-  const { sort, order, serachField, searchValue } = req.query;
+  const { sort, order, searchField, searchValue } = req.query;
 
   const mapColumnas = {
     id: 'p.id_prestamo',
@@ -406,8 +406,8 @@ app.get('/prestamos-detallados', verificarToken, (req, res) => {
 
   let params = [];
 
-  if (serachField && searchValue) {
-    sql += ` AND ${mapFiltros[serachField]} LIKE ?`;
+  if (searchField && searchValue) {
+    sql += ` AND ${mapFiltros[searchField]} LIKE ?`;
     params.push(`%${searchValue}%`);
   }
 

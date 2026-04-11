@@ -15,7 +15,6 @@ function LibroCard({ libro, user }) {
 
   return (
     <div className="group bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col h-full">
-      {/* 1. ÁREA DE IMAGEN (PORTADA)
       <div className="relative aspect-[3/4] bg-slate-100 overflow-hidden">
         <img
           src={
@@ -36,7 +35,6 @@ function LibroCard({ libro, user }) {
           </span>
         </div>
       </div>
-      */}
 
       {/* 2. CUERPO DE LA TARJETA */}
       <div className="p-5 flex flex-col flex-1">
