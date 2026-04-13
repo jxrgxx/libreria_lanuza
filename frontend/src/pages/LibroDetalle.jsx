@@ -37,6 +37,52 @@ function LibroDetalle() {
     e.target.src = '/portadas/default.png';
   };
 
+  const imprimirEtiqueta = () => {
+    const iframe = document.getElementById('iframe-impresion');
+    const contenidoQR = document.getElementById('contenedor-qr').innerHTML;
+
+    const doc = iframe.contentWindow.document;
+
+    doc.open();
+    doc.write(`
+    <html>
+      <head>
+        <title>Etiqueta_${libro.id_libro}_${libro.titulo.replace(/\s+/g, '_')}</title>
+        <style>
+          @font-face {
+            font-family: 'FuenteColegio';
+            src: url('/fonts/Essai.ttf') format('truetype');
+          }
+          @page { size: 50mm 50mm; margin: 0; }
+          body { 
+            font-family: FuenteColegio, sans-serif; 
+            display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; 
+            height: 100vh; margin: 0; text-align: center;
+          }
+          .colegio { font-size: 8px; font-weight: bold; text-transform: uppercase; color: #7F252E; }
+          .titulo { font-size: 10px; font-weight: bold; margin: 2px 0; max-width: 90%; }
+          .id { font-size: 9px; font-family: monospace; }
+          svg { width: 120px !important; height: 120px !important; }
+        </style>
+      </head>
+      <body>
+        <div class="colegio">Colegio Juan de Lanuza</div>
+        <br>
+        ${contenidoQR}
+        <br>
+        <div class="id">ID: ${libro.id_libro}</div>
+      </body>
+    </html>
+  `);
+    doc.close();
+
+    setTimeout(() => {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+    }, 800);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 font-lanuza">
@@ -58,7 +104,7 @@ function LibroDetalle() {
     );
 
   return (
-    <div className="min-h-screen bg-slate-50 font-lanuza flex flex-col">
+    <div className="bg-slate-50 font-lanuza flex flex-col">
       {/* --- 1. BARRA SUPERIOR (NAVBAR) --- */}
       <nav className="bg-white border-b border-slate-200 px-8 py-4 sticky top-0 z-50 shadow-sm">
         <div className="w-full px-4 md:px-10 flex justify-between items-center mx-auto">
@@ -85,7 +131,7 @@ function LibroDetalle() {
       </nav>
 
       {/* --- 2. CONTENIDO PRINCIPAL --- */}
-      <main className="flex-grow p-6 md:p-12">
+      <main className="px-6 py-4 md:px-12 md:py-8">
         <div className="max-w-7xl mx-auto">
           <div className="bg-white rounded-[3rem] shadow-2xl shadow-slate-200/60 border border-slate-100 overflow-hidden flex flex-col md:flex-row min-h-[500px]">
             {/* LADO IZQUIERDO: PORTADA */}
@@ -169,14 +215,16 @@ function LibroDetalle() {
                   </div>
                 </div>
 
-                {/* BLOQUE DEL QR (DISEÑO TIPO TICKET) */}
+                {/* BLOQUE DEL QR */}
                 <div className="w-full lg:w-56 flex flex-col items-center">
                   <div className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 flex flex-col items-center w-full shadow-inner">
                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">
-                      Enseña este QR
+                      Etiqueta del Libro
                     </span>
-
-                    <div className="bg-white p-4 rounded-2xl shadow-md border border-slate-100 mb-4 transition-transform hover:scale-105 duration-300">
+                    <div
+                      id="contenedor-qr"
+                      className="bg-white p-4 rounded-2xl shadow-md border border-slate-100 mb-4"
+                    >
                       <QRCodeSVG
                         value={String(libro.id_libro)}
                         size={140}
@@ -184,14 +232,23 @@ function LibroDetalle() {
                         fgColor="#1e293b"
                       />
                     </div>
+                    <button
+                      onClick={imprimirEtiqueta}
+                      className="w-full flex items-center justify-center gap-2 py-3 bg-[#7F252E] text-white rounded-xl text-xs font-bold hover:bg-[#631d24] transition-all active:scale-95"
+                    >
+                      <span>🖨️ Imprimir Etiqueta</span>
+                    </button>
                   </div>
                 </div>
               </div>
 
-              {/* PIE DE LA FICHA (Opcional: puedes añadir resumen aquí) */}
               <div className="mt-8 pt-6 border-t border-slate-50 text-slate-400 text-[10px] italic">
                 * Los préstamos tienen una duración de 15 días naturales.
               </div>
+              <iframe
+                id="iframe-impresion"
+                style={{ display: 'none' }}
+              ></iframe>
             </div>
           </div>
         </div>

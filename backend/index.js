@@ -128,6 +128,91 @@ app.get('/libros', (req, res) => {
   });
 });
 
+// 1. CREAR LIBRO
+app.post('/libros', verificarToken, (req, res) => {
+  const {
+    titulo,
+    editorial,
+    autor,
+    clasificacion_edad,
+    genero,
+    paginas,
+    isbn,
+    portada_img,
+  } = req.body;
+  const sql =
+    'INSERT INTO libro (titulo, editorial, autor, clasificacion_edad, genero, paginas, isbn, portada_img, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, "Disponible")';
+
+  db.query(
+    sql,
+    [
+      titulo,
+      editorial,
+      autor,
+      clasificacion_edad,
+      genero,
+      paginas,
+      isbn,
+      portada_img,
+    ],
+    (err, result) => {
+      if (err) return res.status(500).json(err);
+      res.json({
+        success: true,
+        message: 'Libro creado correctamente',
+        id: result.insertId,
+      });
+    }
+  );
+});
+
+// 2. EDITAR LIBRO
+app.put('/libros/:id', verificarToken, (req, res) => {
+  const { id } = req.params;
+  const {
+    titulo,
+    editorial,
+    autor,
+    clasificacion_edad,
+    genero,
+    paginas,
+    isbn,
+    portada_img,
+    estado,
+  } = req.body;
+  const sql =
+    'UPDATE libro SET titulo=?, editorial=?, autor=?, clasificacion_edad=?, genero=?, paginas=?, isbn=?, portada_img=?, estado=? WHERE id_libro=?';
+
+  db.query(
+    sql,
+    [
+      titulo,
+      editorial,
+      autor,
+      clasificacion_edad,
+      genero,
+      paginas,
+      isbn,
+      portada_img,
+      estado,
+      id,
+    ],
+    (err) => {
+      if (err) return res.status(500).json(err);
+      res.json({ success: true, message: 'Libro actualizado' });
+    }
+  );
+});
+
+// 3. BORRAR LIBRO
+app.delete('/libros/:id', verificarToken, (req, res) => {
+  const { id } = req.params;
+  db.query('DELETE FROM libro WHERE id_libro = ?', [id], (err) => {
+    if (err) return res.status(500).json(err);
+    res.json({ success: true, message: 'Libro eliminado' });
+  });
+});
+
 app.get('/generos', (req, res) => {
   const sql =
     'select distinct genero from libro where genero is not null and genero != "" order by genero asc';
@@ -280,6 +365,119 @@ app.post('/prestamos', verificarToken, (req, res) => {
               );
             }
           );
+        }
+      );
+    }
+  );
+});
+
+app.get('/prestamos-detallados', verificarToken, (req, res) => {
+  const { sort, order, searchField, searchValue } = req.query;
+
+  const mapColumnas = {
+    id: 'p.id_prestamo',
+    libro: 'l.titulo',
+    alumno: 'u.correo',
+    inicio: 'p.fecha_inicio',
+    limite: 'p.fecha_limite',
+    devolucion: 'p.fecha_devolucion',
+    estado: 'p.devuelto',
+  };
+
+  const mapFiltros = {
+    id_prestamo: 'p.id_prestamo',
+    id_libro: 'p.id_libro',
+    id_usuario: 'p.id_usuario',
+    libro: 'l.titulo',
+    alumno: 'u.correo',
+    fecha_inicio: 'p.fecha_inicio',
+    fecha_limite: 'p.fecha_limite',
+    fecha_devolucion: 'p.fecha_devolucion',
+    devuelto: 'p.devuelto',
+  };
+
+  let sql = `
+    SELECT p.*, l.titulo as titulo_libro, u.correo as correo_usuario 
+    FROM prestamo p
+    JOIN libro l ON p.id_libro = l.id_libro
+    JOIN usuario u ON p.id_usuario = u.id_usuario
+    WHERE 1=1
+  `;
+
+  let params = [];
+
+  if (searchField && searchValue) {
+    sql += ` AND ${mapFiltros[searchField]} LIKE ?`;
+    params.push(`%${searchValue}%`);
+  }
+
+  const campoOrden = mapColumnas[sort] || 'p.fecha_inicio';
+  const direccionOrden = order === 'ASC' || order === 'DESC' ? order : 'DESC';
+
+  sql += ` ORDER BY ${campoOrden} ${direccionOrden}`;
+
+  db.query(sql, params, (err, results) => {
+    if (err) {
+      console.error('Error SQL:', err);
+      return res.status(500).json(err);
+    }
+    res.json(results);
+  });
+});
+
+app.delete('/prestamos/:id', verificarToken, (req, res) => {
+  const { id } = req.params;
+  db.query('DELETE FROM prestamo WHERE id_prestamo = ?', [id], (err) => {
+    if (err) return res.status(500).json(err);
+    res.json({ success: true, message: 'Registro eliminado' });
+  });
+});
+
+app.put('/prestamos/:id', verificarToken, (req, res) => {
+  const { id } = req.params;
+  const {
+    id_libro,
+    id_usuario,
+    fecha_inicio,
+    fecha_limite,
+    fecha_devolucion,
+    devuelto,
+  } = req.body;
+
+  const sql = `
+    UPDATE prestamo 
+    SET id_libro = ?, id_usuario = ?, fecha_inicio = ?, fecha_limite = ?, fecha_devolucion = ?, devuelto = ? 
+    WHERE id_prestamo = ?
+  `;
+
+  db.query(
+    sql,
+    [
+      id_libro,
+      id_usuario,
+      fecha_inicio,
+      fecha_limite,
+      fecha_devolucion,
+      devuelto,
+      id,
+    ],
+    (err) => {
+      if (err) {
+        console.error(err);
+        return res
+          .status(500)
+          .json({ success: false, message: 'Error al actualizar' });
+      }
+
+      const nuevoEstado = devuelto ? 'Disponible' : 'Prestado';
+      db.query(
+        'UPDATE libro SET estado = ? WHERE id_libro = ?',
+        [nuevoEstado, id_libro],
+        () => {
+          res.json({
+            success: true,
+            message: 'Préstamo y estado de libro actualizados',
+          });
         }
       );
     }
