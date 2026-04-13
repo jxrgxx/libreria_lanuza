@@ -191,9 +191,9 @@ function GestionPrestamos({ user }) {
               value={searchField}
               onChange={handleCambioCampo}
             >
+              <option value="id_prestamo">ID Préstamo</option>
               <option value="libro">Título del Libro</option>
               <option value="alumno">Correo del Usuario</option>
-              <option value="id_prestamo">ID Préstamo</option>
               <option value="fecha_inicio">Fecha Inicio</option>
               <option value="fecha_limite">Fecha Límite</option>
               <option value="fecha_devolucion">Fecha Devolución</option>
