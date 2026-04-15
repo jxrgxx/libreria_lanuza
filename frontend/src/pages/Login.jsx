@@ -71,10 +71,11 @@ function Login({ onLoginSuccess }) {
             <input
               type="email"
               className="w-full p-3 transition border outline-none border-slate-200 rounded-xl bg-slate-50 focus:ring-1 focus:ring-[#7F252E] focus:border-[#7F252E]"
-              placeholder="tu_correo@juandelanuza.org"
+              placeholder="Correo"
               value={correo}
               onChange={(e) => setCorreo(e.target.value)}
               required
+              autoComplete="username"
             />
           </div>
 
@@ -90,6 +91,7 @@ function Login({ onLoginSuccess }) {
                 placeholder="••••••••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
                 required
               />
               <button

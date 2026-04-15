@@ -271,13 +271,52 @@ app.put('/libros/:id', verificarToken, (req, res) => {
   );
 });
 
-// Borrar libro
+// Borrar libro e imagen asociada
 app.delete('/libros/:id', verificarToken, (req, res) => {
   const { id } = req.params;
-  db.query('DELETE FROM libro WHERE id_libro = ?', [id], (err) => {
-    if (err) return res.status(500).json(err);
-    res.json({ success: true, message: 'Libro eliminado' });
-  });
+
+  db.query(
+    'SELECT portada_img FROM libro WHERE id_libro = ?',
+    [id],
+    (err, results) => {
+      if (err) return res.status(500).json(err);
+
+      if (results.length === 0) {
+        return res
+          .status(404)
+          .json({ success: false, message: 'Libro no encontrado' });
+      }
+
+      const nombreImagen = path.basename(results[0].portada_img);
+
+      db.query('DELETE FROM libro WHERE id_libro = ?', [id], (err) => {
+        if (err) return res.status(500).json(err);
+
+        if (nombreImagen && nombreImagen !== 'default.png') {
+          const rutaImagen = path.resolve(
+            __dirname,
+            process.env.UPLOAD_PATH,
+            nombreImagen
+          );
+
+          if (fs.existsSync(rutaImagen)) {
+            fs.unlink(rutaImagen, (err) => {
+              if (err) {
+                console.error('Error al borrar el archivo físico:', err);
+              } else {
+                console.log(`✅ Archivo eliminado: ${nombreImagen}`);
+              }
+            });
+          }
+        }
+
+        res.json({
+          success: true,
+          message: 'Libro y su imagen eliminados correctamente',
+        });
+      });
+    }
+  );
 });
 
 // Listas auxiliares para los filtros del frontend
@@ -431,7 +470,7 @@ app.post('/prestamos', verificarToken, (req, res) => {
   );
 });
 
-// Historial detallado con nombres de libros y correos de alumnos
+// Listar prestamos con nombres de libros y correos de alumnos
 app.get('/prestamos-detallados', verificarToken, (req, res) => {
   const { sort, order, searchField, searchValue } = req.query;
 
@@ -547,7 +586,7 @@ app.put('/prestamos/:id', verificarToken, (req, res) => {
   );
 });
 
-// OBTENER DETALLES DE UN LIBRO INDIVIDUAL (Se usa para la página de Ficha del Libro)
+// DETALLES DE UN LIBRO INDIVIDUAL (Se usa para LibroDetalle.jsx)
 app.get('/libros/:id', (req, res) => {
   const { id } = req.params;
   const sql = 'select * from libro where id_libro = ?';
@@ -560,7 +599,7 @@ app.get('/libros/:id', (req, res) => {
   });
 });
 
-// Configuración de dónde y cómo se guardan las fotos
+// Configuración de dónde y cómo se guardan las fotos de lso libros
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = process.env.UPLOAD_PATH || './uploads';
@@ -576,7 +615,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// NUEVO ENDPOINT PARA CREAR LIBRO CON FOTO
+//ENDPOINT PARA CREAR LIBRO CON FOTO
 app.post(
   '/libros-con-foto',
   verificarToken,
@@ -617,3 +656,74 @@ app.post(
     );
   }
 );
+
+// --- ENDPOINTS DE USUARIOS ---
+
+// Obtener usuarios
+app.get('/usuarios', verificarToken, (req, res) => {
+  const { sort, order, searchField, searchValue } = req.query;
+
+  const columnasPermitidas = ['id_usuario', 'correo', 'rol'];
+  const campoOrden = columnasPermitidas.includes(sort) ? sort : 'id_usuario';
+  const direccionOrden = order === 'DESC' ? 'DESC' : 'ASC';
+
+  let sql = 'SELECT id_usuario, correo, rol FROM usuario WHERE 1=1';
+  let params = [];
+
+  if (searchField && searchValue && columnasPermitidas.includes(searchField)) {
+    sql += ` AND ${searchField} LIKE ?`;
+    params.push(`%${searchValue}%`);
+  }
+
+  sql += ` ORDER BY ${campoOrden} ${direccionOrden}`;
+
+  db.query(sql, params, (err, results) => {
+    if (err) return res.status(500).json(err);
+    res.json(results);
+  });
+});
+
+// Crear usuario
+app.post('/usuarios', verificarToken, (req, res) => {
+  const { correo, contrasenya, rol } = req.body;
+  const sql = 'INSERT INTO usuario (correo, contrasenya, rol) VALUES (?, ?, ?)';
+  db.query(sql, [correo, contrasenya, rol || 'alumno'], (err, result) => {
+    if (err) return res.status(500).json(err);
+    res.json({ success: true, id: result.insertId });
+  });
+});
+
+// Editar usuario
+app.put('/usuarios/:id', verificarToken, (req, res) => {
+  const { id } = req.params;
+  const { correo, contrasenya, rol } = req.body;
+
+  let sql;
+  let params;
+
+  if (contrasenya) {
+    sql =
+      'UPDATE usuario SET correo=?, contrasenya=?, rol=? WHERE id_usuario=?';
+    params = [correo, contrasenya, rol, id];
+  } else {
+    sql = 'UPDATE usuario SET correo=?, rol=? WHERE id_usuario=?';
+    params = [correo, rol, id];
+  }
+
+  db.query(sql, params, (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Error al actualizar usuario' });
+    }
+    res.json({ success: true });
+  });
+});
+
+// Borrar usuario
+app.delete('/usuarios/:id', verificarToken, (req, res) => {
+  const { id } = req.params;
+  db.query('DELETE FROM usuario WHERE id_usuario = ?', [id], (err) => {
+    if (err) return res.status(500).json(err);
+    res.json({ success: true, message: 'Usuario eliminado' });
+  });
+});

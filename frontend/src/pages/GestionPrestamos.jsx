@@ -135,7 +135,7 @@ function GestionPrestamos({ user }) {
 
   return (
     <div className="w-full px-4 md:px-10 py-6 font-lanuza animate-in fade-in duration-500">
-      {/* 1. ALTA RÁPIDA */}
+      {/* 1. ALTA PRESTAMO */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
         <div className="lg:col-span-1 bg-white p-8 rounded-3xl shadow-xl border border-slate-100">
           <h2 className="text-xl font-black text-[#7F252E] mb-6 uppercase flex items-center gap-2">
@@ -270,23 +270,26 @@ function GestionPrestamos({ user }) {
         </div>
       </div>
 
-      {/* 2. TABLA DE HISTORIAL COMPLETA */}
+      {/* TABLA */}
       <div className="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
-        <div className="p-6 border-b border-slate-100 bg-slate-50/50">
+        <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
           <h2 className="text-lg font-black uppercase tracking-tight">
-            Historial de Prestamos
+            Prestamos
           </h2>
         </div>
-        <div className="bg-slate-50/30 border-b border-slate-200 overflow-y-scroll scrollbar-invisible">
+
+        {/* CONTENEDOR CON SCROLL VERTICAL Y HORIZONTAL */}
+        <div className="overflow-auto max-h-[600px]">
           <table
-            className="w-full text-left table-layout-fixed"
+            className="w-max min-w-full text-left"
             style={{ tableLayout: 'fixed' }}
           >
-            <thead>
-              <tr className="text-[10px] font-black uppercase tracking-widest text-black">
+            {/* CABECERA */}
+            <thead className="bg-slate-50 sticky top-0 z-10">
+              <tr className="text-[10px] uppercase tracking-widest border-b border-slate-200">
                 {[
                   { label: 'ID', key: 'id', width: '5%' },
-                  { label: 'Libro', key: 'libro', width: '30%' },
+                  { label: 'Libro', key: 'libro', width: '29%' },
                   { label: 'Usuario', key: 'alumno', width: '25%' },
                   { label: 'F.Inicio', key: 'inicio', width: '9%' },
                   { label: 'F.Límite', key: 'limite', width: '9%' },
@@ -299,7 +302,7 @@ function GestionPrestamos({ user }) {
                       key={col.key}
                       onClick={() => handleSort(col.key)}
                       style={{ width: col.width }}
-                      className="p-4 cursor-pointer hover:bg-slate-100 transition-colors group select-none"
+                      className="p-2 cursor-pointer hover:bg-slate-200 transition-colors group select-none text-slate-500 border"
                     >
                       <div className="flex items-center gap-1.5">
                         <span
@@ -325,58 +328,75 @@ function GestionPrestamos({ user }) {
                     </th>
                   );
                 })}
-                <th style={{ width: '6%' }} className="p-4">
+                <th
+                  style={{ width: '7%' }}
+                  className="p-4 border border-slate-200 text-slate-500"
+                >
                   Acciones
                 </th>
               </tr>
             </thead>
-          </table>
-        </div>
 
-        {/* 2. CUERPO DE LA TABLA*/}
-        <div className="overflow-y-auto max-h-[600px] bg-white scrollbar-thin">
-          <table
-            className="w-full text-left table-layout-fixed"
-            style={{ tableLayout: 'fixed' }}
-          >
-            <tbody className="divide-y divide-slate-50">
+            {/* CUERPO */}
+            <tbody className="overflow-y-auto max-h-[600px] bg-white scrollbar-thin">
               {prestamos.map((p) => (
                 <tr
                   key={p.id_prestamo}
-                  className="hover:bg-slate-50 transition-colors text-xl"
+                  className="hover:bg-slate-50 transition-colors text-xs"
                 >
-                  <td className="p-4 text-slate-500" style={{ width: '5%' }}>
+                  <td
+                    className="p-4 text-slate-500 border border-slate-200"
+                    style={{ width: '5%' }}
+                  >
                     #{p.id_prestamo}
                   </td>
                   <td
-                    className="p-4 text-slate-500 truncate"
+                    className="p-4 text-slate-500 border border-slate-200 truncate"
                     title={p.titulo_libro}
-                    style={{ width: '30%' }}
+                    style={{ width: '29%' }}
                   >
                     {p.titulo_libro}
                   </td>
-                  <td className="p-4 text-slate-500" style={{ width: '25%' }}>
+                  <td
+                    className="p-4 text-slate-500 border border-slate-200"
+                    style={{ width: '25%' }}
+                  >
                     {p.correo_usuario}
                   </td>
-                  <td className="p-4 text-slate-500" style={{ width: '9%' }}>
+                  <td
+                    className="p-4 text-slate-500 border border-slate-200"
+                    style={{ width: '9%' }}
+                  >
                     {new Date(p.fecha_inicio).toLocaleDateString()}
                   </td>
-                  <td className="p-4 text-slate-500" style={{ width: '9%' }}>
+                  <td
+                    className="p-4 text-slate-500 border border-slate-200"
+                    style={{ width: '9%' }}
+                  >
                     {new Date(p.fecha_limite).toLocaleDateString()}
                   </td>
-                  <td className="p-4 text-slate-500" style={{ width: '9%' }}>
+                  <td
+                    className="p-4 text-slate-500 border border-slate-200"
+                    style={{ width: '9%' }}
+                  >
                     {p.fecha_devolucion
                       ? new Date(p.fecha_devolucion).toLocaleDateString()
                       : '---'}
                   </td>
-                  <td className="p-4" style={{ width: '7%' }}>
+                  <td
+                    className="p-4 border border-slate-200"
+                    style={{ width: '7%' }}
+                  >
                     <span
                       className={`px-2 py-1 rounded-md text-[9px] font-black ${p.devuelto ? 'bg-green-100 text-green-600' : 'bg-orange-100 text-orange-600'}`}
                     >
                       {p.devuelto ? 'DEVUELTO' : 'EN USO'}
                     </span>
                   </td>
-                  <td className="p-4" style={{ width: '6%' }}>
+                  <td
+                    className="p-4 border border-slate-200"
+                    style={{ width: '7%' }}
+                  >
                     <div className="flex justify-left gap-3">
                       <button
                         onClick={() => setEditando(p)}
@@ -399,7 +419,7 @@ function GestionPrestamos({ user }) {
         </div>
       </div>
 
-      {/* 3. MODAL DE EDICIÓN TOTAL */}
+      {/* MODAL DE EDICIÓN */}
       {editando && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
           <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-2xl overflow-hidden animate-in zoom-in duration-200">

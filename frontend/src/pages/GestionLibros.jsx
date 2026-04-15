@@ -13,6 +13,8 @@ import {
 } from 'lucide-react';
 
 function GestionLibros({ user }) {
+  const headerScrollRef = useRef(null);
+  const bodyScrollRef = useRef(null);
   const [libros, setLibros] = useState([]);
   const [loading, setLoading] = useState(false);
   const [mensaje, setMensaje] = useState({ tipo: '', texto: '' });
@@ -38,6 +40,7 @@ function GestionLibros({ user }) {
   });
 
   const inputRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   const [archivoSeleccionado, setArchivoSeleccionado] = useState(null);
   const [modoCaptura, setModoCaptura] = useState('archivo');
@@ -152,7 +155,11 @@ function GestionLibros({ user }) {
           portada_img: '',
         });
         setArchivoSeleccionado(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
         cargarLibros();
+        setTimeout(() => setMensaje({ tipo: '', texto: '' }), 3000);
       }
     } catch (err) {
       setMensaje({ tipo: 'error', texto: 'Error al subir libro o imagen' });
@@ -186,6 +193,28 @@ function GestionLibros({ user }) {
     }
   };
 
+  useEffect(() => {
+    const headerDiv = headerScrollRef.current;
+    const bodyDiv = bodyScrollRef.current;
+
+    if (!headerDiv || !bodyDiv) return;
+
+    const syncScroll = (source, target) => {
+      target.scrollLeft = source.scrollLeft;
+    };
+
+    const handleHeaderScroll = () => syncScroll(headerDiv, bodyDiv);
+    const handleBodyScroll = () => syncScroll(bodyDiv, headerDiv);
+
+    headerDiv.addEventListener('scroll', handleHeaderScroll);
+    bodyDiv.addEventListener('scroll', handleBodyScroll);
+
+    return () => {
+      headerDiv.removeEventListener('scroll', handleHeaderScroll);
+      bodyDiv.removeEventListener('scroll', handleBodyScroll);
+    };
+  }, []);
+
   return (
     <div className="w-full px-4 md:px-10 py-6 font-lanuza animate-in fade-in duration-500">
       {/* 1. CABECERA: ALTA Y BUSCADOR */}
@@ -193,7 +222,7 @@ function GestionLibros({ user }) {
         {/* PANEL DE INSERCIÓN */}
         <div className="w-full bg-white p-8 rounded-3xl shadow-xl border border-slate-100">
           <div className="flex items-center gap-2 mb-6">
-            <div className="bg-[#7F252E]/10 p-2 rounded-lg">
+            <div>
               <BookPlus size={24} className="text-[#7F252E]" />
             </div>
             <h2 className="text-lg font-black text-[#7F252E] uppercase tracking-tighter">
@@ -205,13 +234,10 @@ function GestionLibros({ user }) {
             {/* FILA 1: Información Principal */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="md:col-span-1">
-                <label className="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-1 block">
-                  Título
-                </label>
                 <input
                   ref={inputRef}
                   type="text"
-                  placeholder="Ej: El Quijote"
+                  placeholder="Titulo"
                   className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-[#7F252E] focus:bg-white transition-all text-sm"
                   value={nuevo.titulo}
                   onChange={(e) =>
@@ -221,12 +247,9 @@ function GestionLibros({ user }) {
                 />
               </div>
               <div className="md:col-span-1">
-                <label className="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-1 block">
-                  Autor
-                </label>
                 <input
                   type="text"
-                  placeholder="Nombre del autor"
+                  placeholder="Autor"
                   className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-[#7F252E] focus:bg-white transition-all text-sm"
                   value={nuevo.autor}
                   onChange={(e) =>
@@ -235,12 +258,9 @@ function GestionLibros({ user }) {
                 />
               </div>
               <div className="md:col-span-1">
-                <label className="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-1 block">
-                  Género
-                </label>
                 <input
                   type="text"
-                  placeholder="Novela, Historia..."
+                  placeholder="Género"
                   className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-[#7F252E] focus:bg-white transition-all text-sm"
                   value={nuevo.genero}
                   onChange={(e) =>
@@ -249,12 +269,9 @@ function GestionLibros({ user }) {
                 />
               </div>
               <div className="md:col-span-1">
-                <label className="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-1 block">
-                  Editorial
-                </label>
                 <input
                   type="text"
-                  placeholder="Planeta, Alfaguara..."
+                  placeholder="Editorial"
                   className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-[#7F252E] focus:bg-white transition-all text-sm"
                   value={nuevo.editorial}
                   onChange={(e) =>
@@ -266,14 +283,10 @@ function GestionLibros({ user }) {
 
             {/* FILA 2: Datos técnicos, Foto y Botón */}
             <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-              {/* Año (1 col) */}
               <div className="md:col-span-1">
-                <label className="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-1 block">
-                  Año
-                </label>
                 <input
                   type="number"
-                  placeholder="2024"
+                  placeholder="Año"
                   className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm outline-none focus:border-[#7F252E]"
                   value={nuevo.anyo_publicacion}
                   onChange={(e) =>
@@ -281,15 +294,10 @@ function GestionLibros({ user }) {
                   }
                 />
               </div>
-
-              {/* Páginas */}
               <div className="md:col-span-1">
-                <label className="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-1 block">
-                  Págs
-                </label>
                 <input
                   type="number"
-                  placeholder="0"
+                  placeholder="Nº pags"
                   className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm outline-none focus:border-[#7F252E]"
                   value={nuevo.paginas}
                   onChange={(e) =>
@@ -297,31 +305,26 @@ function GestionLibros({ user }) {
                   }
                 />
               </div>
-
-              {/* ISBN */}
               <div className="md:col-span-2">
-                <label className="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-1 block">
-                  ISBN
-                </label>
                 <input
                   type="text"
-                  placeholder="978-..."
+                  placeholder="ISBN 13"
                   className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm outline-none focus:border-[#7F252E]"
                   value={nuevo.isbn}
                   onChange={(e) => setNuevo({ ...nuevo, isbn: e.target.value })}
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-1 block text-ellipsis overflow-hidden whitespace-nowrap">
-                  Nombre Archivo Foto
-                </label>
                 <input
                   type="text"
-                  placeholder="nombre-foto.jpg"
+                  placeholder="Nombre foto"
                   className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm outline-none focus:border-[#7F252E]"
                   value={nuevo.portada_img}
                   onChange={(e) =>
-                    setNuevo({ ...nuevo, portada_img: e.target.value })
+                    setNuevo({
+                      ...nuevo,
+                      portada_img: e.target.value.toLowerCase(),
+                    })
                   }
                 />
               </div>
@@ -329,19 +332,33 @@ function GestionLibros({ user }) {
               {/* Subida de Archivo */}
               <div className="md:col-span-3 bg-slate-50 border border-dashed border-slate-300 rounded-2xl p-2 flex flex-col gap-1">
                 <div className="flex justify-between items-center px-2">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    capture={
-                      modoCaptura === 'camara' ? 'environment' : undefined
-                    }
-                    className="w-full text-[10px] file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:bg-[#7F252E] file:text-white cursor-pointer"
-                    onChange={(e) => setArchivoSeleccionado(e.target.files[0])}
-                  />
+                  <label className="py-1.5 px-3 rounded-xl border-0 bg-[#7F252E] text-white text-[10px] cursor-pointer">
+                    {modoCaptura === 'camara' ? 'Foto' : 'Archivo'}
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      capture={
+                        modoCaptura === 'camara' ? 'environment' : undefined
+                      }
+                      className="hidden"
+                      onChange={(e) =>
+                        setArchivoSeleccionado(e.target.files[0])
+                      }
+                    />
+                  </label>
+
+                  <span className="text-[10px] truncate">
+                    {archivoSeleccionado ? archivoSeleccionado.name : '---'}
+                  </span>
+
                   <select
                     className="text-[9px] font-bold bg-white border rounded px-1 py-0.5 outline-none"
                     value={modoCaptura}
-                    onChange={(e) => setModoCaptura(e.target.value)}
+                    onChange={(e) => {
+                      setModoCaptura(e.target.value);
+                      setArchivoSeleccionado(null);
+                    }}
                   >
                     <option value="archivo">Archivo</option>
                     <option value="camara">Cámara</option>
@@ -354,7 +371,7 @@ function GestionLibros({ user }) {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-[#7F252E] text-white py-3.5 rounded-2xl font-black hover:bg-[#631d24] transition-all shadow-lg shadow-[#7F252E]/20 text-sm"
+                  className="w-full bg-[#7F252E] text-white py-3.5 rounded-2xl font-black hover:bg-[#631d24] transition-all text-sm"
                 >
                   {loading ? 'GUARDANDO...' : 'REGISTRAR LIBRO'}
                 </button>
@@ -399,7 +416,6 @@ function GestionLibros({ user }) {
               <option value="estado">Estado</option>
             </select>
 
-            {/* Lógica Condicional: Checkboxes para Estado o Input para el resto */}
             {searchField === 'estado' ? (
               <div className="flex-1 flex flex-wrap gap-4 items-center bg-slate-50 border border-slate-200 px-6 py-2 rounded-2xl shadow-inner">
                 {['disponible', 'prestado', 'no disponible', 'extraviado'].map(
@@ -450,30 +466,34 @@ function GestionLibros({ user }) {
         </div>
       </div>
 
-      {/* 2. TABLA TIPO GESTIÓN PRÉSTAMOS */}
+      {/* TABLA */}
       <div className="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
         <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
           <h2 className="text-lg font-black uppercase tracking-tight">
-            Inventario Completo
+            Inventario Libros
           </h2>
         </div>
 
-        {/* CABECERA FIJA */}
-        <div className="bg-slate-50/30 border-b border-slate-200 overflow-y-scroll scrollbar-invisible">
-          <table className="w-full text-left" style={{ tableLayout: 'fixed' }}>
-            <thead>
-              <tr className="text-[10px] uppercase tracking-widest">
+        {/* CONTENEDOR CON SCROLL VERTICAL Y HORIZONTAL */}
+        <div className="overflow-auto max-h-[600px]">
+          <table
+            className="w-max min-w-full text-left"
+            style={{ tableLayout: 'fixed' }}
+          >
+            {/* CABECERA */}
+            <thead className="bg-slate-50 sticky top-0 z-10">
+              <tr className="text-[10px] uppercase tracking-widest border-b border-slate-200">
                 {[
-                  { label: 'ID', key: 'id_libro', width: '5%' },
-                  { label: 'Título', key: 'titulo', width: '21%' },
-                  { label: 'Autor', key: 'autor', width: '13%' },
-                  { label: 'Género', key: 'genero', width: '9%' },
-                  { label: 'Editorial', key: 'editorial', width: '9%' },
-                  { label: 'Año', key: 'anyo_publicacion', width: '6%' },
-                  { label: 'Págs', key: 'paginas', width: '4%' },
-                  { label: 'ISBN', key: 'isbn', width: '9%' },
-                  { label: 'Estado', key: 'estado', width: '6%' },
-                  { label: 'Portada', key: 'portada_img', width: '13%' },
+                  { label: 'ID', key: 'id_libro', minWidth: '50px' },
+                  { label: 'Título', key: 'titulo', minWidth: '200px' },
+                  { label: 'Autor', key: 'autor', minWidth: '150px' },
+                  { label: 'Género', key: 'genero', minWidth: '100px' },
+                  { label: 'Editorial', key: 'editorial', minWidth: '120px' },
+                  { label: 'Año', key: 'anyo_publicacion', minWidth: '80px' },
+                  { label: 'Págs', key: 'paginas', minWidth: '70px' },
+                  { label: 'ISBN', key: 'isbn', minWidth: '130px' },
+                  { label: 'Estado', key: 'estado', minWidth: '100px' },
+                  { label: 'Portada', key: 'portada_img', minWidth: '200px' },
                 ].map((col) => {
                   const activa = sortConfig.key === col.key;
                   return (
@@ -481,23 +501,25 @@ function GestionLibros({ user }) {
                       key={col.key}
                       onClick={() => handleSort(col.key)}
                       style={{ width: col.width }}
-                      className="p-2 cursor-pointer hover:bg-slate-100 transition-colors group select-none"
+                      className="p-2 cursor-pointer hover:bg-slate-200 transition-colors group select-none text-slate-500 border"
                     >
                       <div className="flex items-center gap-1.5">
-                        <span className={activa ? 'text-[#7F252E]' : ''}>
+                        <span
+                          className={`transition-colors ${activa ? 'text-[#7F252E] font-black' : ''}`}
+                        >
                           {col.label}
                         </span>
                         <span className="flex items-center">
                           {activa ? (
                             sortConfig.direction === 'ASC' ? (
-                              <ArrowUp size={12} />
+                              <ArrowUp size={14} className="text-[#7F252E]" />
                             ) : (
-                              <ArrowDown size={12} />
+                              <ArrowDown size={14} className="text-[#7F252E]" />
                             )
                           ) : (
                             <ArrowUpDown
-                              size={12}
-                              className="opacity-0 group-hover:opacity-100 text-slate-300"
+                              size={14}
+                              className="text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity"
                             />
                           )}
                         </span>
@@ -505,57 +527,74 @@ function GestionLibros({ user }) {
                     </th>
                   );
                 })}
-                <th style={{ width: '5%' }} className="p-4">
+                <th
+                  style={{ minWidth: '80px' }}
+                  className="p-4 border border-slate-200 text-slate-500"
+                >
                   Acciones
                 </th>
               </tr>
             </thead>
-          </table>
-        </div>
 
-        {/* CUERPO CON SCROLL */}
-        <div className="overflow-y-auto max-h-[600px] bg-white">
-          <table className="w-full text-left" style={{ tableLayout: 'fixed' }}>
-            <tbody className="divide-y divide-slate-50">
+            {/* CUERPO */}
+            <tbody className="overflow-y-auto max-h-[600px] bg-white scrollbar-thin">
               {libros.map((l) => (
                 <tr
                   key={l.id_libro}
-                  className="hover:bg-slate-50 transition-colors text-sm"
+                  className="hover:bg-slate-50 transition-colors text-xs"
                 >
-                  <td style={{ width: '5%' }} className="p-2 text-slate-500">
+                  <td
+                    style={{ minWidth: '50px' }}
+                    className="p-2 text-slate-500 border border-slate-200"
+                  >
                     #{l.id_libro}
                   </td>
                   <td
-                    style={{ width: '21%' }}
-                    className="p-2 text-slate-500 truncate"
+                    style={{ minWidth: '200px' }}
+                    className="p-2 text-slate-500 border border-slate-200 truncate"
                   >
                     {l.titulo}
                   </td>
                   <td
-                    style={{ width: '13%' }}
-                    className="p-2 text-slate-500 truncate"
+                    style={{ minWidth: '150px' }}
+                    className="p-2 text-slate-500 border border-slate-200 truncate"
                   >
                     {l.autor}
                   </td>
-                  <td style={{ width: '9%' }} className="p-2 text-slate-500">
+                  <td
+                    style={{ minWidth: '100px' }}
+                    className="p-2 text-slate-500 border border-slate-200"
+                  >
                     {l.genero}
                   </td>
                   <td
-                    style={{ width: '9%' }}
-                    className="p-2 text-slate-500 truncate"
+                    style={{ minWidth: '120px' }}
+                    className="p-2 text-slate-500 border border-slate-200 truncate"
                   >
                     {l.editorial}
                   </td>
-                  <td style={{ width: '6%' }} className="p-2 text-slate-500">
+                  <td
+                    style={{ minWidth: '80px' }}
+                    className="p-2 text-slate-500 border border-slate-200"
+                  >
                     {l.anyo_publicacion}
                   </td>
-                  <td style={{ width: '4%' }} className="p-2 text-slate-500">
+                  <td
+                    style={{ minWidth: '70px' }}
+                    className="p-2 text-slate-500 border border-slate-200"
+                  >
                     {l.paginas}
                   </td>
-                  <td style={{ width: '9%' }} className="p-2 text-slate-500">
+                  <td
+                    style={{ minWidth: '130px' }}
+                    className="p-2 text-slate-500 border border-slate-200"
+                  >
                     {l.isbn}
                   </td>
-                  <td style={{ width: '6%' }} className="p-2 text-slate-500">
+                  <td
+                    style={{ minWidth: '100px' }}
+                    className="p-2 text-slate-500 border border-slate-200"
+                  >
                     <span
                       className={`px-2 py-1 rounded-md text-[9px] font-black ${
                         l.estado === 'Disponible'
@@ -570,22 +609,30 @@ function GestionLibros({ user }) {
                       {l.estado?.toUpperCase()}
                     </span>
                   </td>
-                  <td style={{ width: '13%' }} className="p-2 text-slate-500">
+                  <td
+                    style={{ minWidth: '200px' }}
+                    className="p-2 text-slate-500 border border-slate-200 truncate"
+                  >
                     {l.portada_img}
                   </td>
-                  <td style={{ width: '7%' }} className="p-2 flex gap-1">
-                    <button
-                      onClick={() => setEditando(l)}
-                      className="p-3 text-blue-500 hover:bg-blue-50 rounded-lg transition"
-                    >
-                      <Edit size={14} />
-                    </button>
-                    <button
-                      onClick={() => handleEliminar(l.id_libro)}
-                      className="p-2 text-red-400 hover:bg-red-50 rounded-lg transition"
-                    >
-                      <Trash2 size={14} />
-                    </button>
+                  <td
+                    className="p-4 border border-slate-200"
+                    style={{ minWidth: '80px' }}
+                  >
+                    <div>
+                      <button
+                        onClick={() => setEditando(l)}
+                        className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition"
+                      >
+                        <Edit size={14} />
+                      </button>
+                      <button
+                        onClick={() => handleEliminar(l.id_libro)}
+                        className="p-2 text-red-400 hover:bg-red-50 rounded-lg transition"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -594,7 +641,7 @@ function GestionLibros({ user }) {
         </div>
       </div>
 
-      {/* 3. MODAL DE EDICIÓN TOTAL */}
+      {/* MODAL DE EDICIÓN TOTAL */}
       {editando && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
           <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-2xl overflow-hidden animate-in zoom-in duration-200">
@@ -727,12 +774,15 @@ function GestionLibros({ user }) {
                   className="w-full p-3 bg-blue-50/50 border border-blue-100 rounded-xl font-bold outline-none"
                   value={editando.portada_img}
                   onChange={(e) =>
-                    setEditando({ ...editando, portada_img: e.target.value })
+                    setEditando({
+                      ...editando,
+                      portada_img: e.target.value.toLowerCase(),
+                    })
                   }
                 />
               </div>
 
-              {/* ESTADO (Ocupa 2 columnas) */}
+              {/* ESTADO */}
               <div className="md:col-span-2">
                 <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block">
                   Estado del Ejemplar
