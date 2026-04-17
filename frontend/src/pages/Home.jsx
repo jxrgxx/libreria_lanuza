@@ -149,7 +149,7 @@ function Home({ user, onLogout }) {
                 onClick={() => navigate('/login')}
                 className="bg-[#7F252E] text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-[#631d24] transition-all shadow-lg shadow-red-900/10 active:scale-95 font-lanuza"
               >
-                Acceso Personal
+                Iniciar Sesion
               </button>
             )}
           </div>

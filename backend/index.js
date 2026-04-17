@@ -607,9 +607,9 @@ const storage = multer.diskStorage({
     cb(null, dir);
   },
   filename: (req, file, cb) => {
-    const nombreDeseado = req.body.nombreArchivoCustom || 'temp';
+    const nombreDeseado = req.body.nombreArchivoCustom || 'libro';
     const extension = path.extname(file.originalname);
-    cb(null, nombreDeseado + extension);
+    cb(null, `${nombreDeseado}_${Date.now()}${extension}`);
   },
 });
 
